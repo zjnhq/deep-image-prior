@@ -37,6 +37,7 @@ def get_params(opt_over, net, net_input, downsampler=None):
     opt_over_list = opt_over.split(',')
     params = []
     
+
     for opt in opt_over_list:
     
         if opt == 'net':
@@ -59,7 +60,7 @@ def get_image_grid(images_np, nrow=8):
     
     return torch_grid.numpy()
 
-def plot_image_grid(images_np, nrow =8, factor=1, interpolation='lanczos'):
+def plot_image_grid(images_np, nrow =8, factor=1, interpolation='lanczos', name=None):
     """Draws images in a grid
     
     Args:
@@ -75,16 +76,19 @@ def plot_image_grid(images_np, nrow =8, factor=1, interpolation='lanczos'):
 
     grid = get_image_grid(images_np, nrow)
     
-    plt.figure(figsize=(len(images_np) + factor, 12 + factor))
+    fig=plt.figure(figsize=(len(images_np) + factor, 12 + factor))
     
     if images_np[0].shape[0] == 1:
         plt.imshow(grid[0], cmap='gray', interpolation=interpolation)
     else:
         plt.imshow(grid.transpose(1, 2, 0), interpolation=interpolation)
-    
+    if name!= None:
+        plt.savefig(name)
+    plt.axis('off')
     plt.show()
     
-    return grid
+    
+    return grid,fig
 
 def load(path):
     """Load PIL image."""
@@ -207,17 +211,17 @@ def optimize(optimizer_type, parameters, closure, LR, num_iter):
     """
     if optimizer_type == 'LBFGS':
         # Do several steps with adam first
-        optimizer = torch.optim.Adam(parameters, lr=0.001)
-        for j in range(100):
-            optimizer.zero_grad()
-            closure()
-            optimizer.step()
+        # optimizer = torch.optim.Adam(parameters, lr=0.001)
+        # for j in range(100):
+        #     optimizer.zero_grad()
+        #     closure()
+        #     optimizer.step()
 
         print('Starting optimization with LBFGS')        
         def closure2():
             optimizer.zero_grad()
             return closure()
-        optimizer = torch.optim.LBFGS(parameters, max_iter=num_iter, lr=LR, tolerance_grad=-1, tolerance_change=-1)
+        optimizer = torch.optim.LBFGS(parameters, history_size=5, max_iter=num_iter, lr=LR, tolerance_grad=-1, tolerance_change=-1)
         optimizer.step(closure2)
 
     elif optimizer_type == 'adam':
@@ -230,3 +234,5 @@ def optimize(optimizer_type, parameters, closure, LR, num_iter):
             optimizer.step()
     else:
         assert False
+
+    return optimizer

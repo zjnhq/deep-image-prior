@@ -1,0 +1,5 @@
+
+result/*
+result/sr/zebra_orig.png
+.ipynb_checkpoints/*.ipynb
+*.pyc
