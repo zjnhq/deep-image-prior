@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 import PIL
 import numpy as np
-
+from pdb import *
 import matplotlib.pyplot as plt
 
 def crop_image(img, d=32):
@@ -40,7 +40,9 @@ def get_params(opt_over, net, net_input, downsampler=None):
     for opt in opt_over_list:
     
         if opt == 'net':
-            params += [x for x in net.parameters() ]
+            for x in net.parameters():
+                # set_trace()
+                params += [x  ]
         elif  opt=='down':
             assert downsampler is not None
             params = [x for x in downsampler.parameters()]
